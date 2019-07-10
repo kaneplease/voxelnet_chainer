@@ -80,6 +80,7 @@ def eval_voxelnet():
     for batch in test_iter:
         s = time.time()
         batch = voxelnet_concat(batch, args.gpu)
+				#	.inferenceメソッドは./voxelnet/models/light_voxelnet.pyのなかに記述
         result_reg, result_prob = model.inference(*batch,
                                                   anchor=anchor,
                                                   anchor_center=anchor_center,
@@ -95,6 +96,13 @@ def eval_voxelnet():
     print("total iou", total_iou / index)
     print("prob loss", total_prob_loss / index)
     print("reg loss ", total_reg_loss / index)
+
+		#	保険としてファイル出力を行う
+		with open('Statistis.txt', mode='w') as f:
+			f.write("##############  Statistic ##############")
+			f.write("total iou"+str(total_iou / index))
+			f.write("prob loss"+str(total_prob_loss / index))
+			f.write("reg loss "+str(total_reg_loss / index))
 
 def main():
     eval_voxelnet()

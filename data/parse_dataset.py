@@ -24,7 +24,7 @@ def main():
 
     if args.result_dir:
         subprocess.check_call(['mkdir', '-p', os.path.join(args.out_dir, 'result')])
-        out_file = [os.path.join(args.out_dir, 'result', "{:06}.txt".format(i)) for i in range(len(num_list))]
+        out_file = [os.path.join(args.out_dir,"{:06}.txt".format(i)) for i in range(len(num_list))]
         for gf, of in zip(res_file, out_file):
             subprocess.check_call(['cp', gf, of])
 

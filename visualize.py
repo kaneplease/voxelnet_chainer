@@ -3,6 +3,8 @@ import argparse
 import sys
 import os
 import numpy as np
+import sys
+sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
 import cv2
 import glob
 import math
@@ -193,9 +195,16 @@ def viz_input(args, config):
     test_iter = create_iterator_test(test_data,
                                      config['iterator'])
     dataset_config = config['dataset']['test']['args']
-    for batch in test_iter:
+    for i_b,batch in enumerate(test_iter):
+        #gt_prob, gt_regは両方とも真値なのでは？
         x_list, counter, indexes_list, gt_prob, gt_reg, batch, n_no_empty = batch[0]
+        #print(gt_prob.shape)
+        #print(gt_reg[0,:,:].shape)
+        #gt_probはz座標がどこの点のデータ？
         gt_prob = F.resize_images(gt_prob.astype("f")[np.newaxis, np.newaxis],
+                                  (400, 352))[0, 0].data
+        #gt_reg[z,y,x]の形で与えられている？
+        gt_reg = F.resize_images(gt_reg[7,:,:].astype("f")[np.newaxis, np.newaxis],
                                   (400, 352))[0, 0].data
         len_image = len(x_list)
         fig, axes = plt.subplots(2, 3, figsize=(20, 7))
@@ -209,12 +218,19 @@ def viz_input(args, config):
             slice1 = image.copy()
             slice2 = image.copy()
             slice3 = image.copy()
+						#	緑色をつくっている（lidarの点群でーた）
             slice1[input_x != 0] = 0.3
             slice2[input_x != 0] = .8
             slice3[input_x != 0] = 0.2
+						#	赤色をつくっている（voxelの重心でーた）
             slice1[gt_prob != 0] = 1
             slice2[gt_prob != 0] = 0
             slice3[gt_prob != 0] = 0
+						#	青色をつくっている（voxelの重心データ）
+            slice1[gt_reg != 0] = 0
+            slice2[gt_reg != 0] = 0
+            slice3[gt_reg != 0] = 1
+
             image = np.ones((400, 352, 3))
             image[:, :, 0] = slice1
             image[:, :, 1] = slice2
@@ -225,7 +241,8 @@ def viz_input(args, config):
             axes[i, j].axis('off')
             axes[i, j].set_title("Thres: {}".format(thres_list[index]))
         plt.tight_layout()
-        plt.show()
+        plt.savefig("images/vis/"+"batch_"+str(i_b)+".png")
+        plt.close()
 
 def filter_camera_angle(places, angle=1.):
     """Filter pointclound by camera angle"""

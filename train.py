@@ -23,6 +23,11 @@ from collections import OrderedDict
 yaml.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
     lambda loader, node: OrderedDict(loader.construct_pairs(node)))
 
+# When GPU memory is not enough
+# import cupy as cp
+# pool = cp.cuda.MemoryPool(cp.cuda.malloc_managed)
+# cp.cuda.set_allocator(pool.malloc)
+
 
 def train_voxelnet():
     """Training VoxelNet."""
