@@ -20,6 +20,12 @@ except:
 
 import matplotlib.pyplot as plt
 
+import rospy
+from data_util.kitti_util.input_velodyne import *
+from data_util.kitti_util.parse_xml import parseXML
+import std_msgs.msg
+import sensor_msgs.point_cloud2 as pc2
+from sensor_msgs.msg import PointCloud2
 try:
     import rospy
     from data_util.kitti_util.input_velodyne import *
@@ -83,10 +89,8 @@ def viz_rviz(index, base_path, dataformat="bin",
     rotates = None
     size = None
     proj_velo = None
-
     if dataformat == "bin":
         pc = load_pointcloud_from_bin(velodyne_path)
-
     if calib_path:
         calib = read_calib_file(calib_path)
         proj_velo = proj_img_to_velo(calib)[:, :3]
@@ -196,14 +200,12 @@ def viz_input(args, config):
                                      config['iterator'])
     dataset_config = config['dataset']['test']['args']
     for i_b,batch in enumerate(test_iter):
-        #gt_prob, gt_regは両方とも真値なのでは？
+        #gt_prob, gt_reg are ground truth
         x_list, counter, indexes_list, gt_prob, gt_reg, batch, n_no_empty = batch[0]
         #print(gt_prob.shape)
         #print(gt_reg[0,:,:].shape)
-        #gt_probはz座標がどこの点のデータ？
         gt_prob = F.resize_images(gt_prob.astype("f")[np.newaxis, np.newaxis],
                                   (400, 352))[0, 0].data
-        #gt_reg[z,y,x]の形で与えられている？
         gt_reg = F.resize_images(gt_reg[7,:,:].astype("f")[np.newaxis, np.newaxis],
                                   (400, 352))[0, 0].data
         len_image = len(x_list)
@@ -218,15 +220,15 @@ def viz_input(args, config):
             slice1 = image.copy()
             slice2 = image.copy()
             slice3 = image.copy()
-						#	緑色をつくっている（lidarの点群でーた）
+            # lidar data
             slice1[input_x != 0] = 0.3
             slice2[input_x != 0] = .8
             slice3[input_x != 0] = 0.2
-						#	赤色をつくっている（voxelの重心でーた）
+            # probability of each box
             slice1[gt_prob != 0] = 1
             slice2[gt_prob != 0] = 0
             slice3[gt_prob != 0] = 0
-						#	青色をつくっている（voxelの重心データ）
+						# regression for ground truth
             slice1[gt_reg != 0] = 0
             slice2[gt_reg != 0] = 0
             slice3[gt_reg != 0] = 1
