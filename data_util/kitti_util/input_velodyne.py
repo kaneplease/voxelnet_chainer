@@ -3,6 +3,7 @@ import os
 import sys
 import time
 import numpy as np
+sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
 import cv2
 import glob
 import math

@@ -1,10 +1,25 @@
 #!/usr/bin/env python
+#	only python2
+try:
+    import rospy
+    import std_msgs.msg
+    import sensor_msgs.point_cloud2 as pc2
+    from sensor_msgs.msg import PointCloud2
+except:
+    pass
+from data_util.kitti_util.input_velodyne import *
+from data_util.kitti_util.parse_xml import parseXML
+
+
 import argparse
 import sys
 import os
 import numpy as np
 import sys
-sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
+try:
+    sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
+except:
+    pass
 import cv2
 import glob
 import math
@@ -17,24 +32,17 @@ try:
     import chainer.functions as F
 except:
     pass
-
 import matplotlib.pyplot as plt
 
-import rospy
-from data_util.kitti_util.input_velodyne import *
-from data_util.kitti_util.parse_xml import parseXML
-import std_msgs.msg
-import sensor_msgs.point_cloud2 as pc2
-from sensor_msgs.msg import PointCloud2
-try:
-    import rospy
-    from data_util.kitti_util.input_velodyne import *
-    from data_util.kitti_util.parse_xml import parseXML
-    import std_msgs.msg
-    import sensor_msgs.point_cloud2 as pc2
-    from sensor_msgs.msg import PointCloud2
-except:
-    pass
+#try:
+#    import rospy
+#    from data_util.kitti_util.input_velodyne import *
+#    from data_util.kitti_util.parse_xml import parseXML
+#    import std_msgs.msg
+#    import sensor_msgs.point_cloud2 as pc2
+#    from sensor_msgs.msg import PointCloud2
+#except:
+#    pass
 
 def publish_pc2(pc, obj, pre_obj=None, pc_1=None):
     """Publisher of PointCloud data"""
